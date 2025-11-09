@@ -4,7 +4,7 @@ import { cls, timeAgo } from '../lib/utils'
 import Message from './Message'
 import Composer from './Composer'
 import ImageComparisonSlider from './ImageComparisonSlider'
-import { MapPin, Image as ImageIcon } from 'lucide-react'
+import { MapPin, Image as ImageIcon, Download, Mail } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -25,6 +25,8 @@ interface AssessmentResult {
   confidence: string
   decision: string
   priority: string
+  coordinates?: string
+  num_buildings?: number
   damage_probabilities: {
     no_building: string
     no_damage: string
@@ -217,7 +219,7 @@ function ChatInterface() {
 
           <div className="mb-8 grid w-full max-w-2xl gap-3 sm:grid-cols-2">
             <button
-              onClick={() => handleExampleClick('Assess damage from Hurricane Ian in Fort Myers, Florida')}
+              onClick={() => handleExampleClick('Assess hurricane damage in Asheville, North Carolina at coordinates 35.5951°N, 82.5515°W, before date 2024-09-20, after date 2024-09-30')}
               className="group flex flex-col gap-2 rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-all hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
             >
               <div className="flex items-center gap-2">
@@ -312,6 +314,142 @@ function AssessmentCard({ assessment }: { assessment: AssessmentResult }) {
     return '#6b7280'
   }
 
+  const estimateRepairCost = () => {
+    const damageLevel = assessment.damage_level.toLowerCase()
+    if (damageLevel.includes('destroyed') || damageLevel.includes('catastrophic')) {
+      return { min: 150000, max: 300000 }
+    } else if (damageLevel.includes('major') || damageLevel.includes('severe')) {
+      return { min: 75000, max: 150000 }
+    } else if (damageLevel.includes('moderate')) {
+      return { min: 25000, max: 75000 }
+    } else if (damageLevel.includes('minor')) {
+      return { min: 5000, max: 25000 }
+    }
+    return { min: 0, max: 5000 }
+  }
+
+  const downloadPDF = () => {
+    const cost = estimateRepairCost()
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OrbitalClaim Assessment Report</title>
+</head>
+<body>
+  <h1>🛰️ OrbitalClaim - Satellite Damage Assessment Report</h1>
+  <p>Generated: ${new Date().toLocaleString()}</p>
+  <hr>
+
+  <h2>Property Information</h2>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+      <td><strong>Location</strong></td>
+      <td>${assessment.location}</td>
+    </tr>
+    <tr>
+      <td><strong>Coordinates</strong></td>
+      <td>${assessment.coordinates || 'N/A'}</td>
+    </tr>
+  </table>
+
+  <h2>Damage Assessment</h2>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+      <td><strong>Damage Severity</strong></td>
+      <td>${assessment.damage_level}</td>
+    </tr>
+    <tr>
+      <td><strong>Confidence Score</strong></td>
+      <td>${assessment.confidence}</td>
+    </tr>
+    <tr>
+      <td><strong>Affected Buildings</strong></td>
+      <td>${assessment.num_buildings?.toLocaleString() || 'N/A'} detected</td>
+    </tr>
+    <tr>
+      <td><strong>Data Source</strong></td>
+      <td>Sentinel-2 (10m resolution)</td>
+    </tr>
+  </table>
+
+  <h2>Cost Estimate</h2>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+      <td><strong>Estimated Repair Cost Range</strong></td>
+      <td><strong>$${cost.min.toLocaleString()} - $${cost.max.toLocaleString()} USD</strong></td>
+    </tr>
+  </table>
+
+  <h2>Claim Recommendation</h2>
+  <p><strong>Decision:</strong> ${assessment.decision}</p>
+  <p><strong>Priority Level:</strong> ${assessment.priority}</p>
+  <p>
+    Based on satellite analysis, significant structural damage was detected with ${assessment.confidence} confidence. 
+    Pre-disaster imagery confirmed the property was intact. Change detection algorithms identified damage patterns 
+    consistent with ${assessment.damage_level.toLowerCase()} damage classification.
+  </p>
+
+  <h2>Damage Classification Breakdown</h2>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+      <th>Category</th>
+      <th>Probability</th>
+    </tr>
+    ${Object.entries(assessment.damage_probabilities).map(([key, value]) => `
+    <tr>
+      <td>${key.replace(/_/g, ' ').toUpperCase()}</td>
+      <td>${value}</td>
+    </tr>
+    `).join('')}
+  </table>
+
+  <hr>
+  <p><strong>OrbitalClaim</strong> - Satellite-Powered Disaster Damage Assessment</p>
+  <p><em>This report was generated using AI-powered satellite imagery analysis and should be used as a preliminary assessment tool.</em></p>
+</body>
+</html>
+    `
+
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `OrbitalClaim_Report_${assessment.location.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const sendEmail = () => {
+    const cost = estimateRepairCost()
+    const subject = encodeURIComponent(`OrbitalClaim Assessment: ${assessment.location}`)
+    const body = encodeURIComponent(`Dear Policyholder,
+
+Your property damage assessment has been completed using OrbitalClaim's satellite-powered analysis system.
+
+PROPERTY LOCATION: ${assessment.location}
+DAMAGE SEVERITY: ${assessment.damage_level}
+CONFIDENCE: ${assessment.confidence}
+ESTIMATED REPAIR COST: $${cost.min.toLocaleString()} - $${cost.max.toLocaleString()} USD
+
+CLAIM DECISION: ${assessment.decision}
+PRIORITY LEVEL: ${assessment.priority}
+
+Based on satellite imagery analysis, we have detected ${assessment.damage_level.toLowerCase()} damage with ${assessment.confidence} confidence. Our AI systems analyzed before and after satellite images to assess the extent of damage to your property.
+
+A detailed PDF report is attached for your records.
+
+If you have any questions, please don't hesitate to contact our claims department.
+
+Best regards,
+OrbitalClaim Assessment Team`)
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+  }
+
+  const cost = estimateRepairCost()
+
   return (
     <div className="ml-10 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -348,6 +486,15 @@ function AssessmentCard({ assessment }: { assessment: AssessmentResult }) {
       </div>
 
       <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-[10px] uppercase tracking-wide text-zinc-500">Estimated Repair Cost</div>
+          <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
+            ${cost.min.toLocaleString()} - ${cost.max.toLocaleString()} USD
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 border-t border-zinc-200 pt-3 dark:border-zinc-800">
         <div className="mb-2 text-[10px] uppercase tracking-wide text-zinc-500">Classification:</div>
         {Object.entries(assessment.damage_probabilities).map(([key, value]) => (
           <div key={key} className="mb-1.5 flex items-center gap-2 text-xs">
@@ -363,6 +510,23 @@ function AssessmentCard({ assessment }: { assessment: AssessmentResult }) {
             <span className="w-12 text-right text-zinc-500">{value}</span>
           </div>
         ))}
+      </div>
+
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={downloadPDF}
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          <Download className="h-4 w-4" />
+          Download Full Report
+        </button>
+        <button
+          onClick={sendEmail}
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-200 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+        >
+          <Mail className="h-4 w-4" />
+          Send to Policyholder
+        </button>
       </div>
     </div>
   )

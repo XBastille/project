@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { Send, Loader2, Plus, ImagePlus } from 'lucide-react'
+import { Send, Loader2, Plus, ImagePlus, Map } from 'lucide-react'
 import { cls } from '../lib/utils'
 import axios from 'axios'
+import MapPicker from './MapPicker'
 
 interface ComposerProps {
   onSend?: (text: string) => Promise<void>
@@ -18,6 +19,7 @@ const Composer = forwardRef<any, ComposerProps>(function Composer({ onSend, onIm
   const [beforePreview, setBeforePreview] = useState<string | null>(null)
   const [afterPreview, setAfterPreview] = useState<string | null>(null)
   const [uploadingFor, setUploadingFor] = useState<'before' | 'after' | null>(null)
+  const [showMapPicker, setShowMapPicker] = useState(false)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -192,6 +194,14 @@ const Composer = forwardRef<any, ComposerProps>(function Composer({ onSend, onIm
         <div className="flex items-center justify-between mt-2">
           <div className="flex gap-1">
             <button
+              onClick={() => setShowMapPicker(true)}
+              className="inline-flex shrink-0 items-center gap-1 justify-center rounded-full px-2 py-1.5 text-xs text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
+              title="Pick coordinates from map"
+            >
+              <Map className="h-3.5 w-3.5" />
+              <span className="text-[10px] font-medium">Map</span>
+            </button>
+            <button
               onClick={() => { setUploadingFor('before'); fileInputRef.current?.click(); }}
               disabled={!!beforeImage}
               className="inline-flex shrink-0 items-center gap-1 justify-center rounded-full px-2 py-1.5 text-xs text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -255,6 +265,17 @@ const Composer = forwardRef<any, ComposerProps>(function Composer({ onSend, onIm
           }
         }}
       />
+      
+      {showMapPicker && (
+        <MapPicker
+          onClose={() => setShowMapPicker(false)}
+          onSelect={(lat, lon) => {
+            const coordText = `at coordinates ${lat}°N, ${lon}°W`
+            setValue((prev) => prev ? `${prev} ${coordText}` : coordText)
+            inputRef.current?.focus()
+          }}
+        />
+      )}
     </div>
   )
 })
