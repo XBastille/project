@@ -47,7 +47,7 @@ class InsuranceClaimChatbot:
         logger.info("Initializing InsuranceClaimChatbot...")
         
         # Initialize Gemini
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
             raise ValueError("GEMINI_API_KEY environment variable not set")
         
@@ -183,11 +183,16 @@ Once you have this info, call assess_disaster_damage automatically."""
                 # Use getRegion instead of sampleRectangle for better handling
                 rgb = image.select(['B4', 'B3', 'B2'])
                 
-                # Get thumbnail instead - more reliable
+                # Get thumbnail with proper visualization parameters
+                # Sentinel-2 surface reflectance values range from 0-10000
+                # We need to scale them properly for RGB display
                 thumbnail_url = rgb.getThumbURL({
                     'region': area,
                     'dimensions': '1024x1024',
-                    'format': 'png'
+                    'format': 'png',
+                    'min': 0,
+                    'max': 3000,  # Typical good range for natural colors
+                    'gamma': 1.4   # Slight gamma correction for better contrast
                 })
                 
                 logger.info(f"Downloading from: {thumbnail_url[:50]}...")
