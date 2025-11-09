@@ -167,7 +167,7 @@ def analyze_image():
         
         try:
             # Initialize Gemini client
-            api_key = "AIzaSyARncEnZVsr878AGaSPM3X5Nj3zIpuXlS4"
+            api_key = os.getenv("GEMINI_API_KEY")
             client = genai.Client(api_key=api_key)
             
             # Analyze after image with Gemini
