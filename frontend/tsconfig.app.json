@@ -1,0 +1,8 @@
+{
+  "files.include": ["src"],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
