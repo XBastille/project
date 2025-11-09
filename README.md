@@ -58,10 +58,10 @@ model/
 └── test_outputs/           # Test results
 ```
 
-## 🎯 Hackathon Ready
+## 🎯Ready
 
 ✅ **Automated Damage Claims** from Satellite Imagery  
 ✅ **Natural Language** risk explanation via Gemini  
 ✅ **Real Disasters** tested (Hurricane Ian, Camp Fire)  
 ✅ **Minimal & Dynamic** - No training required  
-✅ **Production Ready** - Complete end-to-end system  
+✅ **Production Ready** - Complete end-to-end system
