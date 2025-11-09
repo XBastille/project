@@ -230,62 +230,6 @@ AI: I'll fetch Sentinel-2 satellite imagery for those coordinates...
 
 ---
 
-## 🔌 API Reference
-
-### **POST /api/chat**
-Process natural language disaster assessment queries.
-
-**Request:**
-```json
-{
-  "message": "Assess damage from Hurricane Ian in Fort Myers"
-}
-```
-
-**Response:**
-```json
-{
-  "response": "AI-generated assessment explanation...",
-  "assessment": {
-    "location": "Fort Myers, Florida",
-    "damage_level": "Major Damage",
-    "confidence": "87.3%",
-    "decision": "APPROVE",
-    "priority": "HIGH",
-    "damage_probabilities": { ... }
-  },
-  "beforeImageUrl": "data:image/png;base64,...",
-  "afterImageUrl": "data:image/png;base64,...",
-  "segmentationImageUrl": "data:image/png;base64,..."
-}
-```
-
-### **POST /api/analyze-image**
-Upload before/after images for damage analysis.
-
-**Request:** `multipart/form-data`
-- `before`: File (image)
-- `after`: File (image)
-
-**Response:** Same structure as `/api/chat`
-
-### **POST /api/sample-analysis**
-Run pre-configured Hurricane Ian sample analysis.
-
-**Response:** Same structure as `/api/chat`
-
-### **GET /api/health**
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "healthy"
-}
-```
-
----
-
 ## 🧪 Testing
 
 ### **Real Disaster Tests**
@@ -354,31 +298,6 @@ project/
 ├── start.py                # Unified startup script
 └── README.md
 ```
-
----
-
-## 🎨 UI Screenshots
-
-### Chat Interface
-- Natural language disaster queries
-- Real-time satellite image fetching
-- Interactive damage visualization
-
-### Assessment Card
-- Damage severity classification
-- Confidence scores and priority levels
-- Cost estimates and recommendations
-- Download reports / Send to policyholder
-
-### Image Comparison
-- Drag-to-compare before/after slider
-- Damage heatmap overlays
-- High-resolution satellite imagery
-
-### Map Picker
-- Interactive coordinate selection
-- OpenStreetMap integration
-- Copy/paste coordinates
 
 ---
 
