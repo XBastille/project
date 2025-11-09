@@ -32,7 +32,7 @@ class InsuranceClaimProcessor:
     Features:
     1. Fetch satellite imagery (Sentinel-2)
     2. Access AlphaEarth embeddings
-    3. Detect building damage (xView2)
+    3. Detect building damage
     4. Make insurance decision
     """
     
@@ -176,7 +176,7 @@ class InsuranceClaimProcessor:
             print("  AlphaEarth: Not available for this location")
         
         # Step 3: Detect damage
-        print("\n[STEP 3/4] Analyzing building damage with xView2 AI...")
+        print("\n[STEP 3/4] Analyzing building damage with AI...")
         result = self.detector.assess(before_img, after_img)
         
         # Step 4: Make insurance decision
@@ -202,7 +202,7 @@ class InsuranceClaimProcessor:
         print(f"Decision:        {result['decision']}")
         print(f"Priority:        {result['priority']}")
         print(f"Buildings:       {result['num_buildings']} pixels detected")
-        print(f"Data Sources:    Sentinel-2 + AlphaEarth + xView2")
+        print(f"Data Sources:    Sentinel-2 + AlphaEarth")
         print(f"{'='*70}\n")
         
         return result

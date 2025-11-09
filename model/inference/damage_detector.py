@@ -26,7 +26,7 @@ except ImportError:
 
 
 def preprocess_inputs(x):
-    """Preprocess images for xView2 models (normalize to [-1, 1])"""
+    """Preprocess images for models (normalize to [-1, 1])"""
     x = np.asarray(x, dtype='float32')
     x /= 127
     x -= 1
@@ -82,7 +82,7 @@ def segment_buildings(model, img, threshold=0.5, patch_size=256):
 class DamageDetector:
     """
     Minimal damage detection system
-    Uses: Building Segmentation + xView2 Damage Classification
+    Uses: Building Segmentation + Damage Classification
     """
     
     def __init__(self, 
@@ -93,7 +93,7 @@ class DamageDetector:
         Initialize detector
         Args:
             segmentation_model_path: path to building segmentation model
-            damage_weights_path: path to xView2 damage classification weights
+            damage_weights_path: path to damage classification weights
             use_gpu: whether to use GPU for inference
         """
         self.device = 'cuda' if use_gpu and torch.cuda.is_available() else 'cpu'
@@ -131,7 +131,7 @@ class DamageDetector:
         # Load damage classification
         print("[LOADING] Damage classification model (ResNet34)...")
         if self.damage_weights_path.exists():
-            from zoo_models import Res34_Unet_Double
+            from models import Res34_Unet_Double
             
             self.damage_model = Res34_Unet_Double(pretrained=False)
             
@@ -192,7 +192,7 @@ class DamageDetector:
             # Fallback to simple change detection
             return self._simple_damage_detection(before_img, after_img)
         
-        # Resize to 1024x1024 for xView2 model
+        # Resize to 1024x1024 for model
         h, w = before_img.shape[:2]
         before_resized = cv2.resize(before_img, (1024, 1024))
         after_resized = cv2.resize(after_img, (1024, 1024))
@@ -256,7 +256,7 @@ class DamageDetector:
         damage_map = self.classify_damage(before_img, after_img)
         
         # Analyze damage across entire image
-        # xView2 outputs damage probabilities for each pixel
+        # outputs damage probabilities for each pixel
         avg_damage = damage_map.mean(axis=(0, 1))  # Average across all pixels
         damage_class = np.argmax(avg_damage)
         

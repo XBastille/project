@@ -1,8 +1,3 @@
-"""
-xView2 Model Architectures
-Copied from xView2_first_place/zoo/models.py for local use
-"""
-
 import numpy as np
 import sys
 from pathlib import Path
@@ -45,7 +40,7 @@ class ConvRelu(nn.Module):
 
 
 class Res34_Unet_Double(nn.Module):
-    """ResNet34 U-Net for damage classification (xView2 first place)"""
+    """ResNet34 U-Net for damage classification ( first place)"""
     def __init__(self, pretrained=True, **kwargs):
         super(Res34_Unet_Double, self).__init__()
         
