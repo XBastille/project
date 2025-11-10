@@ -1,4 +1,4 @@
-<div align="center">
+%<div align="center">
 
 # 🛰️ OrbitalClaim
 
@@ -19,7 +19,7 @@
 
 ## 🎯 Overview
 
-**OrbitalClaim** is an end-to-end AI system that revolutionizes disaster damage assessment for insurance claims. By combining **Google Earth Engine's Sentinel-2 satellite imagery**, **xView2 damage detection models**, and **Gemini 2.0 conversational AI**, it delivers:
+**OrbitalClaim** is an end-to-end AI system that revolutionizes disaster damage assessment for insurance claims. By combining **Google Earth Engine's Sentinel-2 satellite imagery**, **xView2 damage detection models**, and **Gemini 2.5 conversational AI**, it delivers:
 
 - ⚡ **Real-time damage assessment** from space (10m resolution)
 - 🤖 **Natural language interface** for claim processing
@@ -40,7 +40,7 @@
 ### 🤖 **AI-Powered Analysis**
 - **Deep Learning Models**: xView2-trained ResNet34 U-Net for damage classification
 - **5-Class Damage Detection**: No Building, No Damage, Minor, Major, Destroyed
-- **Gemini 2.0 Integration**: Function-calling chatbot with natural language understanding
+- **Gemini 2.5 Integration**: Function-calling chatbot with natural language understanding
 - **Building Segmentation**: Optional Keras-based footprint detection
 
 ### 💼 **Insurance Automation**
@@ -80,7 +80,7 @@
         ┌───────────────────┼───────────────────┐
         │                   │                   │
 ┌───────▼────────┐ ┌────────▼────────┐ ┌───────▼────────┐
-│  Gemini 2.0    │ │  Google Earth   │ │  xView2 Models │
+│  Gemini 2.5    │ │  Google Earth   │ │  xView2 Models │
 │  Function Call │ │  Engine API     │ │  (ResNet34)    │
 │  Chatbot       │ │  Sentinel-2     │ │  Damage CNN    │
 └────────────────┘ └─────────────────┘ └────────────────┘
@@ -92,7 +92,7 @@
 |-------|-------------|
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Leaflet, Axios |
 | **Backend** | Flask, Flask-CORS, Pillow, NumPy, OpenCV |
-| **AI/ML** | PyTorch, Keras, xView2 Models, Gemini 2.0 Flash |
+| **AI/ML** | PyTorch, Keras, xView2 Models, Gemini 2.5 Flash |
 | **Data** | Google Earth Engine, Sentinel-2, AlphaEarth Embeddings |
 
 ---
